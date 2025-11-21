@@ -1,0 +1,283 @@
+import javax.swing.*;
+import javax.swing.border.LineBorder;
+import java.awt.*;
+import java.text.NumberFormat;
+import java.util.Locale;
+
+public class ArunikaWorldApp extends JFrame {
+    private final int PRICE_DEWASA_VIP = 900000;
+    private final int PRICE_ANAK_VIP = 700000;
+    private final int PRICE_DEWASA_REG = 500000;
+    private final int PRICE_ANAK_REG = 300000;
+
+    private JLabel qtyDewasaVIPLabel;
+    private JLabel qtyAnakVIPLabel;
+    private JLabel qtyDewasaRegLabel;
+    private JLabel qtyAnakRegLabel;
+
+    private JTextArea orderSummaryArea;
+    private JLabel totalLabel;
+
+    private int qtyDewasaVIP = 1;
+    private int qtyAnakVIP = 1;
+    private int qtyDewasaReg = 1;
+    private int qtyAnakReg = 1;
+
+    private NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("id-ID"));
+    
+    public ArunikaWorldApp() {
+        setTitle("ARUNIKA WORLD");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(950, 600);
+        setLocationRelativeTo(null);
+        setMinimumSize(new Dimension(900, 500));
+
+        setLayout(new BorderLayout());
+
+        // Header
+        JLabel headerLabel = new JLabel("ARUNIKA WORLD", SwingConstants.CENTER);
+        headerLabel.setFont(new Font("SansSerif", Font.BOLD, 40));
+        headerLabel.setOpaque(true);
+        headerLabel.setBackground(new Color(0, 161, 154)); // Warna biru kehijauan dari gambar
+        headerLabel.setForeground(Color.WHITE);
+        headerLabel.setPreferredSize(new Dimension(0, 80));
+        add(headerLabel, BorderLayout.NORTH);
+
+        // Panel utama, pakai border warna netral
+        JPanel mainPanel = new JPanel(new BorderLayout(20, 0));
+        mainPanel.setBackground(new Color(0, 161, 154));
+
+        // Panel tiket kiri, gunakan GridLayout 4 baris + gap antar kotak
+        JPanel ticketPanel = new JPanel(new GridLayout(4, 1, 0, 15));
+        ticketPanel.setBackground(new Color(0, 161, 154));
+        ticketPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+
+        // Buat panel tiket dengan background dan border yang sesuai
+        ticketPanel.add(createTicketPanel("DEWASA - VIP TICKET", PRICE_DEWASA_VIP, qtyDewasaVIP));
+        ticketPanel.add(createTicketPanel("ANAK - VIP TICKET", PRICE_ANAK_VIP,  qtyAnakVIP));
+        ticketPanel.add(createTicketPanel("DEWASA - REGULER TICKET", PRICE_DEWASA_REG, qtyDewasaReg));
+        ticketPanel.add(createTicketPanel("ANAK - REGULER TICKET", PRICE_ANAK_REG, qtyAnakReg));
+
+        mainPanel.add(ticketPanel, BorderLayout.CENTER);
+
+        // Panel ringkasan kanan dengan warna latar dan border putih
+        JPanel summaryPanel = new JPanel(new BorderLayout());
+        summaryPanel.setBackground(new Color(0, 161, 154));
+        summaryPanel.setPreferredSize(new Dimension(320, 0));
+        summaryPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
+        // Kotak ringkasan dengan warna lebih cerah dan border putih
+        JPanel summaryBox = new JPanel(new BorderLayout());
+        summaryBox.setBackground(new Color(134, 221, 209));  // warna kotak ringkasan yang lebih cerah
+        summaryBox.setBorder(BorderFactory.createLineBorder(Color.WHITE, 3));
+
+        orderSummaryArea = new JTextArea();
+        orderSummaryArea.setEditable(false);
+        orderSummaryArea.setBackground(new Color(134, 221, 209));
+        orderSummaryArea.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        orderSummaryArea.setForeground(Color.BLACK);
+        orderSummaryArea.setLineWrap(true);
+        orderSummaryArea.setWrapStyleWord(true);
+        orderSummaryArea.setMargin(new Insets(10, 10, 10, 10));
+
+        JScrollPane scrollPane = new JScrollPane(orderSummaryArea);
+        scrollPane.setBorder(null);
+        scrollPane.setBackground(new Color(134, 221, 209));
+
+        summaryBox.add(scrollPane, BorderLayout.CENTER);
+
+        JPanel bottomSummaryPanel = new JPanel(new GridLayout(2, 1, 0, 10));
+        bottomSummaryPanel.setBackground(new Color(134, 221, 209));
+        bottomSummaryPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        totalLabel = new JLabel();
+        totalLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
+        totalLabel.setForeground(Color.BLACK);
+
+        JButton nextButton = new JButton("NEXT");
+        nextButton.setBackground(Color.BLACK);
+        nextButton.setForeground(Color.WHITE);
+        nextButton.setFocusPainted(false);
+        nextButton.setPreferredSize(new Dimension(120, 35));
+
+        JPanel totalRow = new JPanel(new BorderLayout());
+        totalRow.setBackground(new Color(134, 221, 209));
+
+        JLabel totalText = new JLabel("Jumlah");
+        totalText.setFont(new Font("SansSerif", Font.BOLD, 18));
+        totalText.setForeground(Color.BLACK);
+
+        totalLabel = new JLabel(currencyFormat.format(0));
+        totalLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
+        totalLabel.setForeground(Color.BLACK);
+
+        // tempatkan kiri & kanan
+        totalRow.add(totalText, BorderLayout.WEST);
+        totalRow.add(totalLabel, BorderLayout.EAST);
+
+        // MASUKKAN baris total ke panel bawah
+        bottomSummaryPanel.add(totalRow, BorderLayout.NORTH);
+
+        // Tombol next tetap kanan bawah
+        bottomSummaryPanel.add(nextButton, BorderLayout.EAST);
+
+        summaryBox.add(bottomSummaryPanel, BorderLayout.SOUTH);
+
+        summaryPanel.add(summaryBox, BorderLayout.CENTER);
+
+        mainPanel.add(summaryPanel, BorderLayout.EAST);
+
+        add(mainPanel, BorderLayout.CENTER);
+
+        updateOrderSummary();
+
+        setVisible(true);
+    }
+
+    private JPanel createTicketPanel(String title, int price, int initialQty) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(new Color(134, 221, 209)); // warna kotak tiket yang lebih cerah
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(Color.BLACK, 1),
+                BorderFactory.createEmptyBorder(10, 15, 10, 15)
+        ));
+
+        JLabel titleLabel = new JLabel(title);
+        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
+        titleLabel.setForeground(Color.BLACK);
+
+        panel.add(titleLabel, BorderLayout.NORTH);
+
+        JTextArea descText = new JTextArea(
+                "Include :\n" +
+                "Ticket Entering Victims land + Fast Track\n" +
+                "VIP Lounge + Lunch + Snack\n" +
+                "Bonus 2S With Bahil"
+        );
+        descText.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        descText.setForeground(Color.BLACK);
+        descText.setBackground(new Color(134, 221, 209));
+        descText.setEditable(false);
+        descText.setMargin(new Insets(6, 0, 6, 0));
+        descText.setLineWrap(true);
+        descText.setWrapStyleWord(true);
+
+        panel.add(descText, BorderLayout.CENTER);
+
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel.setBackground(new Color(134, 221, 209));
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
+
+        JLabel priceLabel = new JLabel(currencyFormat.format(price));
+        priceLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
+        priceLabel.setForeground(Color.BLACK);
+
+        bottomPanel.add(priceLabel, BorderLayout.WEST);
+
+        JPanel qtyPanel = new JPanel();
+        qtyPanel.setBackground(new Color(134, 221, 209));
+
+        JButton minusBtn = new JButton("-");
+        JButton plusBtn = new JButton("+");
+        JLabel qtyLabel = new JLabel(String.valueOf(initialQty));
+        qtyLabel.setPreferredSize(new Dimension(25, 25));
+        qtyLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        qtyLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
+        qtyLabel.setForeground(Color.BLACK);
+
+        minusBtn.setFocusPainted(false);
+        plusBtn.setFocusPainted(false);
+        minusBtn.setPreferredSize(new Dimension(40, 25));
+        plusBtn.setPreferredSize(new Dimension(40, 25));
+
+        switch (title) {
+            case "DEWASA - VIP TICKET":
+                qtyDewasaVIPLabel = qtyLabel;
+                minusBtn.addActionListener(e -> updateQty(-1, title));
+                plusBtn.addActionListener(e -> updateQty(1, title));
+                break;
+            case "ANAK - VIP TICKET":
+                qtyAnakVIPLabel = qtyLabel;
+                minusBtn.addActionListener(e -> updateQty(-1, title));
+                plusBtn.addActionListener(e -> updateQty(1, title));
+                break;
+            case "DEWASA - REGULER TICKET":
+                qtyDewasaRegLabel = qtyLabel;
+                minusBtn.addActionListener(e -> updateQty(-1, title));
+                plusBtn.addActionListener(e -> updateQty(1, title));
+                break;
+            case "ANAK - REGULER TICKET":
+                qtyAnakRegLabel = qtyLabel;
+                minusBtn.addActionListener(e -> updateQty(-1, title));
+                plusBtn.addActionListener(e -> updateQty(1, title));
+                break;
+        }
+
+        qtyPanel.add(minusBtn);
+        qtyPanel.add(qtyLabel);
+        qtyPanel.add(plusBtn);
+
+        bottomPanel.add(qtyPanel, BorderLayout.EAST);
+
+        panel.add(bottomPanel, BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    private void updateQty(int delta, String ticketType) {
+        switch (ticketType) {
+            case "DEWASA - VIP TICKET":
+                qtyDewasaVIP = Math.max(0, qtyDewasaVIP + delta);
+                qtyDewasaVIPLabel.setText(String.valueOf(qtyDewasaVIP));
+                break;
+            case "ANAK - VIP TICKET":
+                qtyAnakVIP = Math.max(0, qtyAnakVIP + delta);
+                qtyAnakVIPLabel.setText(String.valueOf(qtyAnakVIP));
+                break;
+            case "DEWASA - REGULER TICKET":
+                qtyDewasaReg = Math.max(0, qtyDewasaReg + delta);
+                qtyDewasaRegLabel.setText(String.valueOf(qtyDewasaReg));
+                break;
+            case "ANAK - REGULER TICKET":
+                qtyAnakReg = Math.max(0, qtyAnakReg + delta);
+                qtyAnakRegLabel.setText(String.valueOf(qtyAnakReg));
+                break;
+        }
+        updateOrderSummary();
+    }
+
+    private void updateOrderSummary() {
+        StringBuilder sb = new StringBuilder();
+
+        int total = 0;
+        if (qtyDewasaVIP > 0) {
+            sb.append(String.format("DEWASA - VIP TICKET\n%s x %d\n\n", currencyFormat.format(PRICE_DEWASA_VIP), qtyDewasaVIP));
+            total += PRICE_DEWASA_VIP * qtyDewasaVIP;
+        }
+        if (qtyAnakVIP > 0) {
+            sb.append(String.format("ANAK - VIP TICKET\n%s x %d\n\n", currencyFormat.format(PRICE_ANAK_VIP), qtyAnakVIP));
+            total += PRICE_ANAK_VIP * qtyAnakVIP;
+        }
+        if (qtyDewasaReg > 0) {
+            sb.append(String.format("DEWASA - REGULER TICKET\n%s x %d\n\n", currencyFormat.format(PRICE_DEWASA_REG), qtyDewasaReg));
+            total += PRICE_DEWASA_REG * qtyDewasaReg;
+        }
+        if (qtyAnakReg > 0) {
+            sb.append(String.format("ANAK - REGULER TICKET\n%s x %d\n\n", currencyFormat.format(PRICE_ANAK_REG), qtyAnakReg));
+            total += PRICE_ANAK_REG * qtyAnakReg;
+        }
+
+        orderSummaryArea.setText(sb.toString());
+
+        totalLabel.setText(currencyFormat.format(total));
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception ignored) {}
+            new ArunikaWorldApp();
+        });
+    }
+}
