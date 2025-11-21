@@ -1,0 +1,1 @@
+Clean.bat : buat bersihinin class dalam folder src biar enak aja, tinggal klik clean.bat nya terus enter.
