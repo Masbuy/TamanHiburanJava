@@ -13,21 +13,6 @@ Menambahkan logo
   - `src\logo.png`, atau
   - `resources\logo.png`.
 
-Compile & Run (Windows PowerShell)
-
-1) Compile:
-
-```powershell
-cd "c:\Users\bimaw\OneDrive\Desktop\TamanHiburanJava"
-javac -d out src\ArunikaApp.java
-```
-
-2) Run:
-
-```powershell
-java -cp out ArunikaApp
-```
-
 Catatan
 - Jika logo tidak ditemukan, aplikasi akan menampilkan teks placeholder.
 - Anda dapat mengganti teks/warna/tata letak pada file `src\ArunikaApp.java`.
